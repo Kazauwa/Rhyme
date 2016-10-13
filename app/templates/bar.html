@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>User - {{ user }}</title>
+</head>
+<body>
+<table>
+	{% for artist, count in audio %}
+	<tr><td>{{ artist }}</td><td>{{ count }}</td></tr>
+	{% endfor %}
+</table>
+</body>
+</html>
