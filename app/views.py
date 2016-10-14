@@ -1,27 +1,40 @@
 import requests
-import operator
-from collections import Counter
-from flask import render_template, redirect
+import json
+from flask import render_template, redirect, url_for, session
 from app import app
+from .forms import SearchForm
+from config import HEADERS, DISCOGS_API
 
 
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html')
+    # return render_template('index.html')
+    return redirect(url_for('search'))
 
 
-@app.route('/<user_id>/<access_token>')
-def audio(user_id=None, access_token=None):
-    if user_id is None or access_token is None:
-        return redirect(url_for('index'))
-    params = {'uid': user_id, 'access_token': access_token}
-    response = requests.get('https://api.vk.com/method/audio.get', params=params)
-    response = response.json()['response']
-    audio = Counter()
-    for track in response:
-        audio[track['artist'].lower()] += 1
-    audio = sorted(audio.items(), key=operator.itemgetter(1), reverse=True)
-    return render_template('bar.html',
-                            audio=audio[:11],
-                            user=user_id)
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    form = SearchForm()
+    if form.validate_on_submit():
+        session['save_data'] = form.save_to_json.data
+        return redirect(url_for('search_results', query=form.search_by_album.data))
+    return render_template('search.html', form=form)
+
+
+@app.route('/search_results/<query>/', methods=['GET', 'POST'])
+def search_results(query):
+    r = requests.get(DISCOGS_API, params={'q': query, 'type': 'master'}, headers=HEADERS)
+    result = {count + 1: {'id': result.get('id'),
+                          'title': result.get('title'),
+                          'genre': result.get('genre'),
+                          'thumb': result.get('thumb'),
+                          'year': result.get('year')} for count, result in enumerate(r.json()['results'])}
+    if session['save_data']:
+        with open('data.json', 'a') as writer:
+            for key, value in result.items():
+                json.dump({key: value}, writer)
+                writer.write('\n')
+    return render_template('search_results.html',
+                            query=query,
+                            results=result.values())

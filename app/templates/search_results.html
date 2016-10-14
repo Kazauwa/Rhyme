@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search results for {{ query }}</title>
+</head>
+<body>
+    <ul>
+        {% for result in results %}
+        <p>
+            <img src="{{ result.get('thumb') }}"/>
+            <li>{{ result.get('title') }}</li>
+            <li>Year: {{ result.get('year') }}</li>
+            <li>Genre: {{ result.get('genre') }}</li>
+        </p>
+        {% endfor %}
+    </ul>
+</body>
+</html>
