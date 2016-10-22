@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ result.get('title') }}</h1>
+<ul>
+    <img src="{{ result.get('images')[0].get('resource_url') }}">
+    <li>Artist: {{ result.get('artists')[0].get('name') }}</li>
+    <li>Year: {{ result.get('year') }}</li>
+    <li>Genres: {% for genre in result.get('genres') %} {{ genre }} {% endfor %}</li>
+    <li>Tracklist:
+        <ul>
+            {% for track in result.get('tracklist') %} 
+            <li>{{ track.get('position') }}. {{ track.get('title') }} {{ track.get('duration') }}</li>
+            {% endfor %}
+        </ul>
+    </li>
+{% endblock %}
