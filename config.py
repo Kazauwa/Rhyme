@@ -4,6 +4,7 @@ import os
 WTF_CSRF_ENABLED = False
 SECRET_KEY = os.environ.get('FLASK_SECRET')
 BASEDIR = os.path.abspath(os.path.dirname(__name__))
+DEBUG = True
 
 # Discogs
 TOKEN = os.environ.get('DISCOGS_TOKEN')
@@ -16,3 +17,4 @@ APP_ID = os.environ.get('VK_APP_ID')
 
 # SQLAlchemy
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASEDIR, 'app.db')
+SQLALCHEMY_TRACK_MODIFICATIONS = True
