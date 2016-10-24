@@ -3,6 +3,7 @@ import os
 # Global parameters
 WTF_CSRF_ENABLED = False
 SECRET_KEY = os.environ.get('FLASK_SECRET')
+BASEDIR = os.path.abspath(os.path.dirname(__name__))
 
 # Discogs
 TOKEN = os.environ.get('DISCOGS_TOKEN')
@@ -12,3 +13,6 @@ DISCOGS_MASTER = 'https://api.discogs.com/masters/'
 
 # VK
 APP_ID = os.environ.get('VK_APP_ID')
+
+# SQLAlchemy
+SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASEDIR, 'app.db')
