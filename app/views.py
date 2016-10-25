@@ -1,6 +1,5 @@
 import requests
-import json
-from flask import render_template, redirect, url_for, session
+from flask import render_template, redirect, url_for
 from app import app
 from .forms import SearchForm
 from config import HEADERS, DISCOGS_QUERY, DISCOGS_MASTER
@@ -17,7 +16,6 @@ def index():
 def search():
     form = SearchForm()
     if form.validate_on_submit():
-        session['save_data'] = form.save_to_json.data
         return redirect(url_for('search_results', query=form.search_by_album.data))
     return render_template('search.html', form=form)
 
@@ -30,14 +28,9 @@ def search_results(query):
                           'genre': result.get('genre'),
                           'thumb': result.get('thumb'),
                           'year': result.get('year')} for count, result in enumerate(r.json()['results'])}
-    if session['save_data']:
-        with open('data.json', 'a') as writer:
-            for key, value in result.items():
-                json.dump({key: value}, writer)
-                writer.write('\n')
     return render_template('search_results.html',
-                            query=query,
-                            results=result.values())
+                           query=query,
+                           results=result.values())
 
 
 @app.route('/album/id<master_id>')
