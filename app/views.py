@@ -1,8 +1,23 @@
 import requests
-from flask import render_template, redirect, url_for
-from app import app
+from flask import render_template, redirect, url_for, request
+from app import app, db
 from .forms import SearchForm
-from config import HEADERS, DISCOGS_QUERY, DISCOGS_MASTER
+from app.models import Album, Track, Artist
+from config import HEADERS, DISCOGS_MASTER
+
+
+def construct_query(data):
+    #query = db.session.query(*form.to_dict().keys())
+    #if form.search_by_album.data:
+        #    query = query.filter(Album.title == form.search_by_album.data)
+    #if form.search_by_artist.data:
+        #    query = query.filter(Artist.name == form.search_by_artist.data)
+    #if form.search_track.data:
+        #    query = query.filter(Track.title == form.search_track.data)
+    #if form.year.data:
+        #    query = query.filter(Album.year == form.year.data)
+    #result = query.all()
+    pass
 
 
 @app.route('/')
@@ -16,21 +31,9 @@ def index():
 def search():
     form = SearchForm()
     if form.validate_on_submit():
-        return redirect(url_for('search_results', query=form.search_by_album.data))
-    return render_template('search.html', form=form)
-
-
-@app.route('/search_results/<query>/', methods=['GET', 'POST'])
-def search_results(query):
-    r = requests.get(DISCOGS_QUERY, params={'q': query, 'type': 'master'}, headers=HEADERS)
-    result = {count + 1: {'id': result.get('id'),
-                          'title': result.get('title'),
-                          'genre': result.get('genre'),
-                          'thumb': result.get('thumb'),
-                          'year': result.get('year')} for count, result in enumerate(r.json()['results'])}
-    return render_template('search_results.html',
-                           query=query,
-                           results=result.values())
+        construct_query(form.data)
+        return render_template('search.html', form=form, results=request.args)
+    return render_template('search.html', form=form, results='There is none')
 
 
 @app.route('/album/id<master_id>')

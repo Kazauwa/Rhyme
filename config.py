@@ -1,7 +1,7 @@
 import os
 
 # Global parameters
-WTF_CSRF_ENABLED = False
+WTF_CSRF_ENABLED = True
 SECRET_KEY = os.environ.get('FLASK_SECRET')
 BASEDIR = os.path.abspath(os.path.dirname(__name__))
 DEBUG = True
@@ -16,5 +16,5 @@ DISCOGS_MASTER = 'https://api.discogs.com/masters/'
 APP_ID = os.environ.get('VK_APP_ID')
 
 # SQLAlchemy
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASEDIR, 'app.db')
+SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
 SQLALCHEMY_TRACK_MODIFICATIONS = True
