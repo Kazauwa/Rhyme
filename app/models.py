@@ -1,6 +1,5 @@
 from app import db
 
-
 tracklist = db.Table('tracklist',
                      db.Column('album_id', db.Integer, db.ForeignKey('album.id')),
                      db.Column('track_id', db.Integer, db.ForeignKey('track.id')))

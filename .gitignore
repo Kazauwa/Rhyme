@@ -9,6 +9,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 flask/
+migrations/
 env/
 build/
 develop-eggs/
