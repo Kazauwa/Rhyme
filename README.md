@@ -25,6 +25,13 @@ That's it! You are ready to start! Run `./manage.py runserver` in terminal to st
 
 ## Managing
 
-Currently manage.py can only run the application and manage migrations. More functions will be added in future. 
+More functions will be added in future. 
+
+To fill local db with data, [download] (http://data.discogs.com/) the latest dump (discogs_xxx_masters.xml.gz) unpack it and run
+```
+./manage.py fill_db path/to/masters.xml
+```
+
+After that, run `./manage.py fill_track` to complete filling your DB.
 
 For managing migrations read the [official documentation] (https://flask-migrate.readthedocs.io/en/latest/)
