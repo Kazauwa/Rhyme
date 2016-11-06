@@ -12,20 +12,21 @@ class SearchForm(FlaskForm):
     year = StringField('Year', validators=[Optional(), Length(max=4)])
 
     # map form fields to database fields/attributes
-    field_to_attr = {'search_by_album': Album.title,
-                     'search_by_artist': Artist.name,
-                     'search_track': Track.title,
-                     'year': Album.year}
+    __field_to_attr = {'search_by_album': Album.title,
+                       'search_by_artist': Artist.name,
+                       'search_track': Track.title,
+                       'year': Album.year}
 
     def construct_query(self):
         query = db.session.query(*[field.label.text for field in self if field.data and not field.name == 'csrf_token'])
         for field in self:
             if field.data and not field.name == 'csrf_token':
-                query = query.filter(self.field_to_attr[field.name] == field.data)
+                query = query.filter(self.__field_to_attr[field.name] == field.data)
         result = query.all()
         return result
 
     def validate(self):
+        #FIXME
         if not super().validate():
             return False
         if not self.search_by_album and not self.search_by_artist and not self.search_track and not self.year:
