@@ -10,5 +10,4 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 manager = Manager(app)
 
-
 from app import views, models

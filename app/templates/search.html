@@ -5,15 +5,32 @@
     {{ form.hidden_tag() }}
     Search: {{ form.search }}
     <p><input type="submit" value="Search"></p>
+    {{ section }}
 
-{% if results %}
-<h2>Search results</h2>
-<button action="{{ url_for('search', method=Artist) }}" method="post">Artist</button>
-<ul>
-    <p>
-    {{ results }}
-    </p>
-</ul>
-{% endif %}
+    {% if results %}
+    <h2>Search results</h2>
+    <form action="{{ url_for('search', section='artist') }}">
+        <input type="submit" value="Artist" />
+    </form>
+    <form action="{{ url_for('search', section='album') }}">
+        <input type="submit" value="Album" />
+    </form>
+    <form action="{{ url_for('search', section='track') }}">
+        <input type="submit" value="Track" />
+    </form>
+    <form action="{{ url_for('search', section='year') }}">
+        <input type="submit" value="Year" />
+    </form>
+    <ul>
+        <p>
+            {% for result in results %}
+            <li>Title: {{ result.title }}</li>
+            <li>Year: {{ result.year }}</li>
+            <li>Genre: {{ result.genre.all() }}</li>
+            <br>
+            {% endfor %}
+        </p>
+    </ul>
+    {% endif %}
     {% endblock %}
 

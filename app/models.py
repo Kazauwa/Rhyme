@@ -1,6 +1,5 @@
 from app import db
 
-
 releases = db.Table('releases',
                     db.Column('artist_id', db.Integer, db.ForeignKey('artist.id')),
                     db.Column('album_id', db.Integer, db.ForeignKey('album.id')))
@@ -84,18 +83,24 @@ class SearchIndex(db.Model):
 
     @staticmethod
     def search_artist(query):
-        return SearchIndex.query.filter(
+        results = SearchIndex.query.filter(
             SearchIndex.search_text.ilike('%{0}%'.format(query))).filter(SearchIndex.model_type == 'artist').all()
+        objectives = [result.object_id for result in results]
+        return Artist.query.filter(Artist.id.in_(objectives)).all()
 
     @staticmethod
     def search_album(query):
-        return SearchIndex.query.filter(
+        results = SearchIndex.query.filter(
             SearchIndex.search_text.ilike('%{0}%'.format(query))).filter(SearchIndex.model_type == 'album').all()
+        objectives = [result.object_id for result in results]
+        return Album.query.filter(Album.id.in_(objectives)).all()
 
     @staticmethod
     def search_track(query):
-        return SearchIndex.query.filter(
+        results = SearchIndex.query.filter(
             SearchIndex.search_text.ilike('%{0}%'.format(query))).filter(SearchIndex.model_type == 'track').all()
+        objectives = [result.object_id for result in results]
+        return Track.query.filter(Track.id.in_(objectives)).all()
 
     def __repr__(self):
         return '<{0}: {1}, id: {2}>'.format(self.model_type,
