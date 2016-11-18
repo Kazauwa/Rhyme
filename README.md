@@ -32,6 +32,11 @@ To fill local db with data, [download] (http://data.discogs.com/) the latest dum
 ./manage.py fill_db path/to/masters.xml
 ```
 
-After that, run `./manage.py fill_track` to complete filling your DB.
+After that, run `./manage.py fill_track` to complete filling database.
+
+**Don't forget** to index your data, otherwise **search** won't be working
+```
+./manage.py build_index
+```
 
 For managing migrations read the [official documentation] (https://flask-migrate.readthedocs.io/en/latest/)
