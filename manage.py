@@ -3,7 +3,7 @@ import sys
 import requests
 import xml.etree.ElementTree as etree
 from app import manager, db
-from app.models import Genre, Album, Artist, Track
+from app.models import Genre, Album, Artist, Track, SearchIndex
 from config import HEADERS, DISCOGS_MASTER
 from flask_migrate import MigrateCommand
 from tqdm import tqdm
@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 @manager.command
 def fill_db(dump):
-    '''Fill whole db from dump. Requires dump name as parameter'''
+    '''Fill db using discogs dump. Requires dump name as a parameter'''
     print('Processing dump. Please wait...')
     tree = etree.parse(dump)
     root = tree.getroot()
@@ -68,6 +68,24 @@ def fill_track():
                 # TODO: remove later
                 print(sys.exc_info())
                 db.session.rollback()
+
+
+@manager.command
+def build_index():
+    '''Index database'''
+    models = [Album, Artist, Track]
+    for model in models:
+        print('Indexing {0} table... ({1}/{2})'.format(model.__tablename__,
+                                                       models.index(model) + 1, len(models)))
+        for entry in tqdm(model.query.all()):
+            index = SearchIndex(search_text=entry.get_search_term(),
+                                model_type=entry.__tablename__, object_id=entry.id)
+            try:
+                db.session.add(index)
+                db.session.commit()
+            except:
+                db.session.rollback()
+        print('Done')
 
 
 manager.add_command('db', MigrateCommand)

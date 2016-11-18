@@ -3,13 +3,12 @@
 {% block content %}
 <form action="" method="post" name="Search">
     {{ form.hidden_tag() }}
-    {% for field in form %}
-        {{ field.label }} {{ field }}<br>
-    {% endfor %}
+    Search: {{ form.search }}
     <p><input type="submit" value="Search"></p>
 
 {% if results %}
 <h2>Search results</h2>
+<button action="{{ url_for('search', method=Artist) }}" method="post">Artist</button>
 <ul>
     <p>
     {{ results }}

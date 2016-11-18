@@ -1,5 +1,6 @@
 from app import db
 
+
 releases = db.Table('releases',
                     db.Column('artist_id', db.Integer, db.ForeignKey('artist.id')),
                     db.Column('album_id', db.Integer, db.ForeignKey('album.id')))
@@ -24,8 +25,11 @@ class Track(db.Model):
     position = db.Column(db.String())
     album_id = db.Column(db.Integer, db.ForeignKey('album.id'))
 
+    def get_search_term(self):
+        return '{0}'.format(self.title)
+
     def __repr__(self):
-        return '<Track %r>' % self.title
+        return '<Track {0}>'.format(self.title)
 
 
 class Album(db.Model):
@@ -42,8 +46,11 @@ class Album(db.Model):
                             backref=db.backref('albums', lazy='dynamic'),
                             lazy='dynamic')
 
+    def get_search_term(self):
+        return '{0} {1}'.format(self.title, self.year)
+
     def __repr__(self):
-        return '<Album %r>' % self.title
+        return '<Album {0}>'.format(self.title)
 
 
 class Artist(db.Model):
@@ -58,5 +65,39 @@ class Artist(db.Model):
                                backref=db.backref('artists', lazy='dynamic'),
                                lazy='dynamic')
 
+    def get_search_term(self):
+        return '{0}'.format(self.name)
+
     def __repr__(self):
-        return '<Artist %r>' % self.name
+        return '<Artist {0}>'.format(self.name)
+
+
+class SearchIndex(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    search_text = db.Column(db.String(256))
+    model_type = db.Column(db.String(64))
+    object_id = db.Column(db.Integer)
+
+    @staticmethod
+    def search_all(query):
+        return SearchIndex.query.filter(SearchIndex.search_text.ilike('%{0}%'.format(query))).all()
+
+    @staticmethod
+    def search_artist(query):
+        return SearchIndex.query.filter(
+            SearchIndex.search_text.ilike('%{0}%'.format(query))).filter(SearchIndex.model_type == 'artist').all()
+
+    @staticmethod
+    def search_album(query):
+        return SearchIndex.query.filter(
+            SearchIndex.search_text.ilike('%{0}%'.format(query))).filter(SearchIndex.model_type == 'album').all()
+
+    @staticmethod
+    def search_track(query):
+        return SearchIndex.query.filter(
+            SearchIndex.search_text.ilike('%{0}%'.format(query))).filter(SearchIndex.model_type == 'track').all()
+
+    def __repr__(self):
+        return '<{0}: {1}, id: {2}>'.format(self.model_type,
+                                            self.search_text,
+                                            self.object_id)
