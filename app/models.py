@@ -35,8 +35,8 @@ class Album(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(256))
     year = db.Column(db.String(4))
-    cover = db.Column(db.String(256), unique=True)
-    thumb = db.Column(db.String(256), unique=True)
+    cover = db.Column(db.String(512), unique=True)
+    thumb = db.Column(db.String(512), unique=True)
     discogs_id = db.Column(db.Integer, unique=True)
     tracklist = db.relationship('Track', backref='album', lazy='dynamic')
     genre = db.relationship('Genre', secondary=style,
@@ -55,8 +55,8 @@ class Album(db.Model):
 class Artist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256))
-    image = db.Column(db.String(256))
-    thumb = db.Column(db.String(256))
+    image = db.Column(db.String(512))
+    thumb = db.Column(db.String(512))
     discogs_id = db.Column(db.Integer, unique=True)
     releases = db.relationship('Album', secondary=releases,
                                primaryjoin=(releases.c.artist_id == id),
@@ -77,28 +77,28 @@ class SearchIndex(db.Model):
     model_type = db.Column(db.String(64))
     object_id = db.Column(db.Integer)
 
-    @staticmethod
-    def search_all(query):
-        return SearchIndex.query.filter(SearchIndex.search_text.ilike('%{0}%'.format(query))).all()
+    @classmethod
+    def search_all(cls, query):
+        return cls.query.filter(cls.search_text.ilike('%{0}%'.format(query))).all()
 
-    @staticmethod
-    def search_artist(query):
-        results = SearchIndex.query.filter(
-            SearchIndex.search_text.ilike('%{0}%'.format(query))).filter(SearchIndex.model_type == 'artist').all()
+    @classmethod
+    def search_artist(self, query):
+        results = self.query.filter(
+            self.search_text.ilike('%{0}%'.format(query))).filter(self.model_type == 'artist').all()
         objectives = [result.object_id for result in results]
         return Artist.query.filter(Artist.id.in_(objectives)).all()
 
-    @staticmethod
-    def search_album(query):
-        results = SearchIndex.query.filter(
-            SearchIndex.search_text.ilike('%{0}%'.format(query))).filter(SearchIndex.model_type == 'album').all()
+    @classmethod
+    def search_album(self, query):
+        results = self.query.filter(
+            self.search_text.ilike('%{0}%'.format(query))).filter(self.model_type == 'album').all()
         objectives = [result.object_id for result in results]
         return Album.query.filter(Album.id.in_(objectives)).all()
 
-    @staticmethod
-    def search_track(query):
-        results = SearchIndex.query.filter(
-            SearchIndex.search_text.ilike('%{0}%'.format(query))).filter(SearchIndex.model_type == 'track').all()
+    @classmethod
+    def search_track(self, query):
+        results = self.query.filter(
+            self.search_text.ilike('%{0}%'.format(query))).filter(self.model_type == 'track').all()
         objectives = [result.object_id for result in results]
         return Track.query.filter(Track.id.in_(objectives)).all()
 
