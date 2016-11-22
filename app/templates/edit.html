@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Edit your profile</h1>
+{% include 'flash.html' %}
+<form action="" method="post" name="Edit">
+{{ form.hidden_tag() }}
+
+Nickname: {{ form.nickname }} <br>
+{% for error in form.errors.nickname %}
+{{ error }}<br>
+{% endfor %}
+
+<p><input type="submit" value="Save"></p>
+
+<a href="{{ url_for('user', nickname=g.user.nickname) }}">Back</a>
+{% endblock %}

@@ -2,7 +2,12 @@
 
 {% block content %}
 <h3>This is index</h3>
+{% include 'flash.html' %}
 
-<a href="{{url_for('login')}}">Войти с помощью ВКонтакте</a>
+<a href="{{ url_for('login')}}">Войти с помощью ВКонтакте</a> <br>
+{% if current_user.is_authenticated %}
+<a href="{{ url_for('user', nickname=g.user.nickname)}}">Личный кабинет</a> <br>
+<a href="{{ url_for('logout') }}">Выйти</a>
+{% endif %}
 
 {% endblock %}

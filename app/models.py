@@ -1,3 +1,4 @@
+import re
 from app import db
 
 releases = db.Table('releases',
@@ -110,10 +111,12 @@ class SearchIndex(db.Model):
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nickname = db.Column(db.String(32), unique=True)
     first_name = db.Column(db.String(32))
     last_name = db.Column(db.String(32))
+    nickname = db.Column(db.String(32), unique=True)
+    profile_pic = db.Column(db.String(128), unique=True)
     vk_id = db.Column(db.Integer, unique=True)
+    sex = db.Column(db.Integer())
 
     @property
     def is_authenticated(self):
@@ -129,6 +132,22 @@ class User(db.Model):
 
     def get_id(self):
         return str(self.id)
+
+    @staticmethod
+    def make_unique_nickname(nickname):
+        if User.query.filter_by(nickname=nickname).first() is None:
+            return nickname
+        version = 2
+        while True:
+            new_nickname = nickname + str(version)
+            if User.query.filter_by(nickname=new_nickname).first() is None:
+                break
+            version += 1
+        return new_nickname
+
+    @staticmethod
+    def make_valid_nickname(nickname):
+        return re.sub('[^a-zA-Z0-9_\.]', '', nickname)
 
     def __repr__(self):
         return '<User {0}>'.format(self.nickname)
