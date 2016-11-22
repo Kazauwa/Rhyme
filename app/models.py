@@ -106,3 +106,29 @@ class SearchIndex(db.Model):
         return '<{0}: {1}, id: {2}>'.format(self.model_type,
                                             self.search_text,
                                             self.object_id)
+
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nickname = db.Column(db.String(32), unique=True)
+    first_name = db.Column(db.String(32))
+    last_name = db.Column(db.String(32))
+    vk_id = db.Column(db.Integer, unique=True)
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_active(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return str(self.id)
+
+    def __repr__(self):
+        return '<User {0}>'.format(self.nickname)

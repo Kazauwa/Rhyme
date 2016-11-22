@@ -12,7 +12,8 @@ HEADERS = {'Authorization': 'Discogs token=' + TOKEN, 'User-Agent': 'RhymeApp/0.
 DISCOGS_MASTER = 'https://api.discogs.com/masters/'
 
 # VK
-APP_ID = os.environ.get('VK_APP_ID')
+VK_APP_ID = os.environ.get('VK_APP_ID')
+VK_APP_SECRET = os.environ.get('VK_APP_SECRET')
 
 # SQLAlchemy
 SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
