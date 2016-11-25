@@ -1,13 +1,13 @@
 import re
 from app import db
 
-releases = db.Table('releases',
-                    db.Column('artist_id', db.Integer, db.ForeignKey('artist.id')),
-                    db.Column('album_id', db.Integer, db.ForeignKey('album.id')))
-
 style = db.Table('style',
                  db.Column('album_id', db.Integer, db.ForeignKey('album.id')),
                  db.Column('genre_id', db.Integer, db.ForeignKey('genre.id')))
+
+collection = db.Table('collection',
+                      db.Column('album_id', db.Integer, db.ForeignKey('album.id')),
+                      db.Column('user_id', db.Integer, db.ForeignKey('user.id')))
 
 
 class Genre(db.Model):
@@ -15,7 +15,7 @@ class Genre(db.Model):
     genre = db.Column(db.String(32), unique=True)
 
     def __repr__(self):
-        return '<Genre %r>' % self.genre
+        return '{0}'.format(self.genre)
 
 
 class Track(db.Model):
@@ -40,6 +40,7 @@ class Album(db.Model):
     thumb = db.Column(db.String(512), unique=True)
     discogs_id = db.Column(db.Integer, unique=True)
     tracklist = db.relationship('Track', backref='album', lazy='dynamic')
+    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'))
     genre = db.relationship('Genre', secondary=style,
                             primaryjoin=(style.c.album_id == id),
                             secondaryjoin=(style.c.genre_id == Genre.id),
@@ -59,11 +60,7 @@ class Artist(db.Model):
     image = db.Column(db.String(512))
     thumb = db.Column(db.String(512))
     discogs_id = db.Column(db.Integer, unique=True)
-    releases = db.relationship('Album', secondary=releases,
-                               primaryjoin=(releases.c.artist_id == id),
-                               secondaryjoin=(releases.c.album_id == Album.id),
-                               backref=db.backref('artists', lazy='dynamic'),
-                               lazy='dynamic')
+    releases = db.relationship('Album', backref='artist', lazy='dynamic')
 
     def get_search_term(self):
         return '{0}'.format(self.name)
@@ -83,23 +80,23 @@ class SearchIndex(db.Model):
         return cls.query.filter(cls.search_text.ilike('%{0}%'.format(query))).all()
 
     @classmethod
-    def search_artist(self, query):
-        results = self.query.filter(
-            self.search_text.ilike('%{0}%'.format(query))).filter(self.model_type == 'artist').all()
+    def search_artist(cls, query):
+        results = cls.query.filter(
+            cls.search_text.ilike('%{0}%'.format(query))).filter(cls.model_type == 'artist').all()
         objectives = [result.object_id for result in results]
         return Artist.query.filter(Artist.id.in_(objectives)).all()
 
     @classmethod
-    def search_album(self, query):
-        results = self.query.filter(
-            self.search_text.ilike('%{0}%'.format(query))).filter(self.model_type == 'album').all()
+    def search_album(cls, query):
+        results = cls.query.filter(
+            cls.search_text.ilike('%{0}%'.format(query))).filter(cls.model_type == 'album').all()
         objectives = [result.object_id for result in results]
         return Album.query.filter(Album.id.in_(objectives)).all()
 
     @classmethod
-    def search_track(self, query):
-        results = self.query.filter(
-            self.search_text.ilike('%{0}%'.format(query))).filter(self.model_type == 'track').all()
+    def search_track(cls, query):
+        results = cls.query.filter(
+            cls.search_text.ilike('%{0}%'.format(query))).filter(cls.model_type == 'track').all()
         objectives = [result.object_id for result in results]
         return Track.query.filter(Track.id.in_(objectives)).all()
 
@@ -114,9 +111,14 @@ class User(db.Model):
     first_name = db.Column(db.String(32))
     last_name = db.Column(db.String(32))
     nickname = db.Column(db.String(32), unique=True)
-    profile_pic = db.Column(db.String(128), unique=True)
+    profile_pic = db.Column(db.String(256), unique=True)
     vk_id = db.Column(db.Integer, unique=True)
     sex = db.Column(db.Integer())
+    collection = db.relationship('Album', secondary=collection,
+                                 primaryjoin=(collection.c.user_id == id),
+                                 secondaryjoin=(collection.c.album_id == Album.id),
+                                 backref=db.backref('user\'s collection', lazy='dynamic'),
+                                 lazy='dynamic')
 
     @property
     def is_authenticated(self):

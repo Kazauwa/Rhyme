@@ -1,20 +1,33 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    {% include 'flash.html' %}
-    
-    {% if results %}
-    <h2>Search results</h2>
-    <ul>
-        <p>
-            {% for result in results %}
-            <li>Title: {{ result.title }}</li>
-            <li>Year: {{ result.year }}</li>
-            <li>Genre: {{ result.genre.all() }}</li>
-            <br>
-            {% endfor %}
-        </p>
-    </ul>
-    {% endif %}
-    {% endblock %}
+{% include 'flash.html' %}
 
+{% if results %}
+    <h2>Search results</h2>
+    <div class="form-group">
+        <ul>
+            <p>
+                {% for result in results %}
+                    {% if option == "search_album" %}
+                        <li>Title: <a href=" {{ url_for('album', id=result.id) }}">{{ result.title }}</a></li>
+                        <li>Year: {{ result.year }}</li>
+                        <li>Genre: {{ result.genre.all() }}</li>
+                        <br>
+                    {% elif option == "search_artist" %}
+                        <li>Name: {{ result.name }}</li>
+                        <br>
+                    {% elif option == "search_track" %}
+                        <li>Title: {{ result.title }}</li>
+                        <li>Album: {{ result.album_id }}</li>
+                        <br>
+                    {% else %}
+                        {{ result }}
+                    {% endif %}
+                {% endfor %}
+            </p>
+        </ul>
+    </div>
+{% endif %}
+
+{% endblock %}

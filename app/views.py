@@ -3,7 +3,7 @@ from flask_oauthlib.client import OAuthException
 from flask_login import login_required, login_user, current_user, logout_user
 from app import app, vk, db, lm
 from .forms import SearchForm, EditForm
-from .models import SearchIndex, User
+from .models import SearchIndex, User, Album, Artist
 
 
 @lm.user_loader
@@ -30,12 +30,14 @@ def index():
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
-    form = SearchForm()
-    if form.validate_on_submit():
-        query = SearchIndex.search_album(form.data.get('search'))
-        return render_template('search.html', form=form, results=query)
+    if g.search_form.validate_on_submit():
+        method = getattr(SearchIndex, request.form['options'])
+        query = method(g.search_form.data.get('search'))
+        if query is None:
+            flash('Your query returned no results. Try changing your query.')
+        return render_template('search.html', results=query, option=request.form['options'])
     flash('Input some data in order to perform search')
-    return render_template('search.html', form=form, results=None)
+    return render_template('search.html', results=None)
 
 
 @app.route('/login')
@@ -103,3 +105,10 @@ def edit():
     else:
         form.nickname.data = g.user.nickname
     return render_template('edit.html', form=form)
+
+
+@app.route('/album/id<int:id>')
+def album(id):
+    result = Album.query.get(id)
+    artist = Artist.query.get(result.artist_id)
+    return render_template('album.html', result=result, artist=artist)

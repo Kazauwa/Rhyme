@@ -6,30 +6,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Rhyme</title>
 </head>
+
 <body>
     <div class="container">
         <nav class="navbar navbar-default">
           <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-            <a class="navbar-brand" href="{{ url_for('index') }}">Rhyme</a>
-        </div>
-
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav">
-              <li><a href="{{ url_for('index') }}">Home</a></li>
-              {% if g.user.is_authenticated %}
-              <li><a href="{{ url_for('user', nickname=g.user.nickname) }}">Profile</a></li>
-              <li><a href="{{ url_for('logout') }}">Logout</a></li>
-              {% endif %}
-          </ul>
-          {% if g.user.is_authenticated %}
-          <form class="navbar-form navbar-right" action="{{ url_for('search') }}", method="post" name="search">
-            <div class="form-group">
-                {{ g.search_form.hidden_tag() }}{{ g.search_form.search(size=20,placeholder="Search...",class="form-control") }}
+                <a class="navbar-brand" href="{{ url_for('index') }}">Rhyme</a>
             </div>
-            <button type="submit" class="btn btn-default">Search</button>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul class="nav navbar-nav">
+                  <li><a href="{{ url_for('index') }}">Home</a></li>
+                  {% if g.user.is_authenticated %}
+                  <li><a href="{{ url_for('user', nickname=g.user.nickname) }}">Profile</a></li>
+                  <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                  {% endif %}
+              </ul>
+              {% if g.user.is_authenticated %}
+              <form class="navbar-form navbar-right" action="{{ url_for('search') }}", method="post" name="search">
+                <div class="form-group">
+                    {{ g.search_form.hidden_tag() }}{{ g.search_form.search(size=20,placeholder="Search...",class="form-control") }}
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" action="submit">Search by... <span class="caret"></span></button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                      <li><a href="{{ url_for('search', section='All') }}">All</a></li>
+                      <li><a href="{{ url_for('search', section='Album') }}">Album</a></li>
+                      <li><a href="{{ url_for('search', section='Artist') }}">Artist</a></li>
+                      <li><a href="{{ url_for('search', section='Track') }}">Track</a></li>
+                  </ul>
+                  <div class="radio">
+                    <label><input type="radio" name="options" id="optionsRadios1" value="search_all">All</label>
+                </div>
+                <div class="radio">
+                    <label><input type="radio" name="options" id="optionsRadios2" value="search_album">Album</label>
+                </div>
+                <div class="radio">
+                    <label><input type="radio" name="options" id="optionsRadios3" value="search_artist">Artist</label>
+                </div>
+                <div class="radio">
+                    <label><input type="radio" name="options" id="optionsRadios4" value="search_track">Track</label>
+                </div>
+            </div>
         </form>
         {% endif %}
     </div><!-- /.navbar-collapse -->
@@ -37,6 +56,10 @@
 </nav>
 {% block content %}{% endblock %}
 </div>
+
+
+<!--JQuery -->
+<script src="http://code.jquery.com/jquery-latest.js"></script>
 
 <!-- Bootstrap core -->
 <link href="/static/css/bootstrap.min.css" rel="stylesheet">
@@ -46,9 +69,6 @@
 
 <!-- Bootstrap JS -->
 <script src="/static/js/bootstrap.min.js"></script>
-
-<!--JQuery -->
-<script src="http://code.jquery.com/jquery-latest.js"></script>
 
 </body>
 </html>
