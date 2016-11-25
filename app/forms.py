@@ -5,7 +5,7 @@ from wtforms.validators import DataRequired, InputRequired
 
 
 class SearchForm(FlaskForm):
-    search = StringField('Search', validators=[InputRequired()])
+    search = StringField('Search', validators=[DataRequired()])
 
 
 class EditForm(FlaskForm):

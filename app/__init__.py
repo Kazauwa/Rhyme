@@ -14,7 +14,7 @@ migrate = Migrate(app, db)
 manager = Manager(app)
 lm = LoginManager()
 lm.init_app(app)
-oauth = OAuth(app) 
+oauth = OAuth(app)
 
 vk = oauth.remote_app(
     'vk',
@@ -25,7 +25,6 @@ vk = oauth.remote_app(
     request_token_url=None,
     access_token_url='https://oauth.vk.com/access_token',
     access_token_method='GET',
-    # access_token_params={'redirect_uri': 'http://52.57.140.78'},
     authorize_url='https://oauth.vk.com/authorize')
 
 if not app.debug:

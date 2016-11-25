@@ -14,6 +14,7 @@ def load_user(id):
 @app.before_request
 def before_request():
     g.user = current_user
+    g.search_form = SearchForm()
 
 
 @vk.tokengetter
@@ -25,8 +26,6 @@ def get_vk_oauth_token(token=None):
 @app.route('/index')
 def index():
     return render_template('index.html')
-    #return redirect(url_for('search', filter=None))
-    #return redirect(url_for('login'))
 
 
 @app.route('/search', methods=['GET', 'POST'])
@@ -35,6 +34,7 @@ def search():
     if form.validate_on_submit():
         query = SearchIndex.search_album(form.data.get('search'))
         return render_template('search.html', form=form, results=query)
+    flash('Input some data in order to perform search')
     return render_template('search.html', form=form, results=None)
 
 
@@ -42,7 +42,11 @@ def search():
 def login():
     if g.user is not None and g.user.is_authenticated:
         return 'You are already logged in!'
-    return vk.authorize(callback='http://52.57.140.78/login/authorized')
+    callback = url_for(
+        'vk_authorized',
+        next=request.args.get('next') or request.referrer or None,
+        _external=True)
+    return vk.authorize(callback=callback)
 
 
 @app.route('/logout')
@@ -73,7 +77,6 @@ def vk_authorized():
         db.session.add(user)
         db.session.commit()
     login_user(user)
-    flash('Logged in as {0}'.format(user.nickname))
     return redirect(url_for('index'))
 
 

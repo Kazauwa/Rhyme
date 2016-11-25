@@ -8,7 +8,7 @@ DEBUG = True
 
 # Discogs
 TOKEN = os.environ.get('DISCOGS_TOKEN')
-#HEADERS = {'Authorization': 'Discogs token=' + TOKEN, 'User-Agent': 'RhymeApp/0.1'}
+HEADERS = {'Authorization': 'Discogs token=' + TOKEN, 'User-Agent': 'RhymeApp/0.1'}
 DISCOGS_MASTER = 'https://api.discogs.com/masters/'
 
 # VK

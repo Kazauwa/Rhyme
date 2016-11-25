@@ -1,26 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<form action="" method="post" name="Search">
-    {{ form.hidden_tag() }}
-    Search: {{ form.search }}
-    <p><input type="submit" value="Search"></p>
-    {{ section }}
-
+    {% include 'flash.html' %}
+    
     {% if results %}
     <h2>Search results</h2>
-    <form action="{{ url_for('search', section='artist') }}">
-        <input type="submit" value="Artist" />
-    </form>
-    <form action="{{ url_for('search', section='album') }}">
-        <input type="submit" value="Album" />
-    </form>
-    <form action="{{ url_for('search', section='track') }}">
-        <input type="submit" value="Track" />
-    </form>
-    <form action="{{ url_for('search', section='year') }}">
-        <input type="submit" value="Year" />
-    </form>
     <ul>
         <p>
             {% for result in results %}
