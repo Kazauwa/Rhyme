@@ -4,7 +4,7 @@ import requests
 import xml.etree.ElementTree as etree
 from app import manager, db
 from app.models import Genre, Album, Artist, Track, SearchIndex
-from config import HEADERS, DISCOGS_MASTER
+#from config import HEADERS, DISCOGS_MASTER
 from flask_migrate import MigrateCommand
 from tqdm import tqdm
 

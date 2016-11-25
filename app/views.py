@@ -42,11 +42,7 @@ def search():
 def login():
     if g.user is not None and g.user.is_authenticated:
         return 'You are already logged in!'
-    callback = url_for(
-        'vk_authorized',
-        next=request.args.get('next') or request.referrer or None,
-        _external=True)
-    return vk.authorize(callback=callback)
+    return vk.authorize(callback='http://52.57.140.78/login/authorized')
 
 
 @app.route('/logout')
