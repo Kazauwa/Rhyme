@@ -9,6 +9,10 @@ collection = db.Table('collection',
                       db.Column('album_id', db.Integer, db.ForeignKey('album.id')),
                       db.Column('user_id', db.Integer, db.ForeignKey('user.id')))
 
+followers = db.Table('followers',
+                     db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
+                     db.Column('followed_id', db.Integer, db.ForeignKey('user.id')))
+
 
 class Genre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -77,7 +81,13 @@ class SearchIndex(db.Model):
 
     @classmethod
     def search_all(cls, query):
-        return cls.query.filter(cls.search_text.ilike('%{0}%'.format(query))).all()
+        results = cls.query.filter(cls.search_text.ilike('%{0}%'.format(query))).all()
+        yield Artist.query.filter(Artist.id.in_(
+            [result.object_id for result in results if result.model_type == 'artist'])).limit(5).all()
+        yield Album.query.filter(Album.id.in_([
+            result.object_id for result in results if result.model_type == 'album'])).limit(5).all()
+        yield Track.query.filter(Track.id.in_(
+            [result.object_id for result in results if result.model_type == 'track'])).limit(5).all()
 
     @classmethod
     def search_artist(cls, query):
@@ -112,6 +122,7 @@ class User(db.Model):
     last_name = db.Column(db.String(32))
     nickname = db.Column(db.String(32), unique=True)
     profile_pic = db.Column(db.String(256), unique=True)
+    thumb = db.Column(db.String(256), unique=True)
     vk_id = db.Column(db.Integer, unique=True)
     sex = db.Column(db.Integer())
     collection = db.relationship('Album', secondary=collection,
@@ -119,6 +130,13 @@ class User(db.Model):
                                  secondaryjoin=(collection.c.album_id == Album.id),
                                  backref=db.backref('user\'s collection', lazy='dynamic'),
                                  lazy='dynamic')
+
+    followed = db.relationship('User',
+                               secondary=followers,
+                               primaryjoin=(followers.c.follower_id == id),
+                               secondaryjoin=(followers.c.followed_id == id),
+                               backref=db.backref('followers', lazy='dynamic'),
+                               lazy='dynamic')
 
     @property
     def is_authenticated(self):
@@ -150,6 +168,35 @@ class User(db.Model):
     @staticmethod
     def make_valid_nickname(nickname):
         return re.sub('[^a-zA-Z0-9_\.]', '', nickname)
+
+    def follow(self, user):
+        if not self.is_following(user):
+            self.followed.append(user)
+            return self
+
+    def unfollow(self, user):
+        if self.is_following(user):
+            self.followed.remove(user)
+            return self
+
+    def add_album(self, album):
+        if not self.has_album(album):
+            self.collection.append(album)
+            return self
+
+    def remove_album(self, album):
+        if self.has_album(album):
+            self.collection.remove(album)
+            return self
+
+    def is_following(self, user):
+        return self.followed.filter(followers.c.followed_id == user.id).count() > 0
+
+    def has_album(self, album):
+        return self.collection.filter(collection.c.album_id == album.id).count() > 0
+
+    def latest(self):
+        return self.collection.all()[:-7:-1]
 
     def __repr__(self):
         return '<User {0}>'.format(self.nickname)

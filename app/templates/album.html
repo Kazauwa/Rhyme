@@ -1,16 +1,27 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% include 'flash.html' %}
+
 <h1>{{ result.title }}</h1>
 <ul>
-    <li>Artist: {{ artist.name }}</li>
-    <li>Year: {{ result.year }}</li>
-    <li>Genres: {% for genre in result.genre.all() %} {{ genre }}; {% endfor %}</li>
-    <li>Tracklist:
-        <ul>
-            {% for track in result.tracklist.all() %} 
-            <li>{{ track.position }}. {{ track.title }} {{ track.duration }}</li>
-            {% endfor %}
-        </ul>
-    </li>
+    <img src="{{ result.cover }}" class="img-responsive img-rounded" style="height:auto; max-width:30%"/>
+    <h4>Artist: {{ artist.name }}</h4>
+    <h4>Year: {{ result.year }}</h4>
+    <h4>Genres: {% for genre in result.genre.all() %} {{ genre }}; {% endfor %}</h4>
+    <h4>Tracklist:</h4>
+    <ul>
+        {% for track in result.tracklist.all() %} 
+        <h5>{{ track.position }}. {{ track.title }} {{ track.duration }}</h5>
+        {% endfor %}
+    </ul>
+</ul>
+{% if g.user.is_authenticated %}
+    {% if not g.user.has_album(result) %}
+        <a class="btn btn-primary" href="{{ url_for('add_album', id=result.id) }}" role="button">Add to collection</a>
+    {% else %}
+        <a class="btn btn-danger" href="{{ url_for('remove_album', id=result.id) }}" role="button">Remove from collection</a>
+    {% endif %}
+{% endif %}
+
 {% endblock %}

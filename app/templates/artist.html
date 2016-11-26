@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'flash.html' %}
+
+<h1>{{ result.title }}</h1>
+<ul>
+    <li>Name: {{ result.name }}</li>
+    <li>Releases:
+        <ul>
+            {% for album in result.releases.all() %} 
+            <li><a href="{{ url_for('album', id=album.id) }}">{{album.title}}</li>
+            {% endfor %}
+        </ul>
+    </li>
+{% endblock %}

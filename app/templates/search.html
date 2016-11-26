@@ -4,29 +4,55 @@
 {% include 'flash.html' %}
 
 {% if results %}
-    <h2>Search results</h2>
+    <h2>Search results:</h2>
     <div class="form-group">
+    <div class="well">
         <ul>
             <p>
                 {% for result in results %}
                     {% if option == "search_album" %}
-                        <li>Title: <a href=" {{ url_for('album', id=result.id) }}">{{ result.title }}</a></li>
-                        <li>Year: {{ result.year }}</li>
-                        <li>Genre: {{ result.genre.all() }}</li>
+                        <img src="{{ result.thumb }}" class="img-rounded">
+                        <h5>Title: <a href=" {{ url_for('album', id=result.id) }}">{{ result.title }}</a> ({{ result.year }})</h5>
+                        <h5>Genre: {% for genre in result.genre %} {{ genre }}; {% endfor %}</h5>
                         <br>
                     {% elif option == "search_artist" %}
-                        <li>Name: {{ result.name }}</li>
+                        <img src="{{ result.thumb }}" class="img-rounded">
+                        <h5><a href="{{ url_for('artist', id=result.id) }}">{{ result.name }}</a></h5>
                         <br>
                     {% elif option == "search_track" %}
-                        <li>Title: {{ result.title }}</li>
-                        <li>Album: {{ result.album_id }}</li>
+                        Title: <a href=" {{ url_for('album', id=result.album_id) }}">{{ result.title }}</a>
                         <br>
                     {% else %}
-                        {{ result }}
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="well">
+                                    {{ result[0] }}
+                                        <h4>Albums</h4>
+                                        {{ i }}
+                                        {#<!--p>Title: <a href="#">{{ result.title }}</a>#}
+                                        {# Year: {{ result.year }} #}
+                                        {# Genre: {{ result.genre.all() }} #}</p-->
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="well">
+                                    {% for i in result %}
+                                        <h4>Artists</h4>
+                                        {{ i }}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="well">
+                                    <h4>Tracks</h4>
+                                </div>
+                            </div>
+                        </div>
                     {% endif %}
                 {% endfor %}
             </p>
         </ul>
+    </div>
     </div>
 {% endif %}
 

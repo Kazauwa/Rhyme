@@ -1,8 +1,58 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<img src="{{ user.profile_pic }}"> <br>
-Nickname: {{ user.nickname }} <br>
-Sex: {{ user.sex }} <br>
-<a href="{{ url_for('edit') }}">Edit</a>
+
+<div class="row">
+    <div class="col-md-3">
+        <img src="{{ user.profile_pic }}" class="img-rounded"><br>
+            <h4>Nickname: {{ user.nickname }}</h4>
+            {% if sex != 0 %}
+                {% if user.sex == 1 %}
+                    <h4> Sex: Female </h4> <br>
+                {% else %}
+                    <h4> Sex: Male </h4> <br>
+                {% endif %}
+            {% endif %}
+            {% if user.id == g.user.id %}
+                <a class="btn btn-info" href="{{ url_for('edit') }}" role="button">{{ 'Edit your profile' }}</a>
+            {% elif not g.user.is_following(user) %}
+                <a class="btn btn-primary" href="{{ url_for('follow', nickname=user.nickname) }}" role="button">{{ 'Follow' }}</a>
+            {% else %}
+                <a class="btn btn-danger" href="{{ url_for('unfollow', nickname=user.nickname) }}" role="button">{{ 'Unfollow' }}</a>
+            {% endif %}
+    </div>
+    <div class="col-md-6">
+        {% if g.user.collection %}
+            <h3>Collection:</h3>
+                <div class="row">
+                    {% for album in g.user.collection %}
+                        <div class="col-md-4">
+                            <center><img src="{{ album.thumb }}" class="img-rounded"></center><br>
+                            <div class="caption">
+                                <center><a href="{{ url_for('album', id=album.id) }}">{{ album.title }}</a></center><br>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>            
+        {% else %}
+            <center><h3> {{ g.user.nickname }} is not following anyone yet! </h3></center>
+        {% endif %}
+    </div>
+    <div class="col-md-3">
+        {% if g.user.following %}
+            <h4>Follows:</h4>
+            <div class="well">
+                {% for followee in g.user.following %}
+                    <center><img src="{{ followee.thumb }}" class="img-rounded"></center><br>
+                    <div class="caption">
+                        <center><a href="{{ url_for('user', id=followee.id) }}">{{ followee.nickname }}</a></center><br>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <center><h3> {{ g.user.nickname }} is not following anyone yet! </h3></center>
+        {% endif %}
+    </div>
+</div>
+
 {% endblock %}

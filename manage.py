@@ -68,6 +68,10 @@ def fill_track():
                 # TODO: remove later
                 print(sys.exc_info())
                 db.session.rollback()
+        album.cover = result.get('images')[0].get('uri')
+        album.thumb = result.get('images')[0].get('uri150')
+        db.session.add(album)
+        db.session.commit()
 
 
 @manager.command

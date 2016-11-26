@@ -1,17 +1,22 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Edit your profile</h1>
+
 {% include 'flash.html' %}
-<form action="" method="post" name="Edit">
+
+<h1>Edit your profile</h1><br>
 {{ form.hidden_tag() }}
-
-Nickname: {{ form.nickname }} <br>
-{% for error in form.errors.nickname %}
-{{ error }}<br>
-{% endfor %}
-
-<p><input type="submit" value="Save"></p>
-
-<a href="{{ url_for('user', nickname=g.user.nickname) }}">Back</a>
+<form class="col-md-4 form-horizontal" action="" method="post" name="edit">
+    <div class="form-group{% if form.errors.post %} error{% endif %}">
+        <label for="nickname" class="col-sm-3 control-label">Nickname:</label>
+        <div class="col-sm-9">
+        {{ form.nickname(class = "form-control", id="nickname") }}
+        {% for error in form.errors.nickname %}
+            <span class="help-block">{{error}}</span><br>
+        {% endfor %}
+        </div>
+    </div>
+    <a class="btn btn-default" href="{{ url_for('user', nickname=g.user.nickname) }}" role="button">Back</a>
+    <input class="btn btn-primary control" type="submit" value="Submit">
+</form>
 {% endblock %}

@@ -68,14 +68,16 @@ def vk_authorized():
     session['oauth_token'] = (resp['access_token'], '')
     user = User.query.filter_by(vk_id=resp['user_id']).first()
     if not user:
-        me = vk.request('users.get', data={'access_token': resp['access_token'], 'fields': 'sex,photo_max_orig,domain'})
+        me = vk.request('users.get', data={'access_token': resp['access_token'],
+                                           'fields': 'sex,photo_200,photo_100,domain'})
         me = me.data['response'][0]
         user = User(vk_id=me.get('uid'),
                     first_name=me.get('first_name'),
                     last_name=me.get('last_name'),
                     nickname=me.get('domain'),
                     sex=me.get('sex'),
-                    profile_pic=me.get('photo_max_orig'))
+                    profile_pic=me.get('photo_200'),
+                    thumb=me.get('photo_100'))
         db.session.add(user)
         db.session.commit()
     login_user(user)
@@ -107,8 +109,89 @@ def edit():
     return render_template('edit.html', form=form)
 
 
+@app.route('/user/<nickname>/follow')
+@login_required
+def follow(nickname):
+    user = User.query.filter_by(nickname=nickname).first()
+    if user is None:
+        flash('User {0} not found.'.format(nickname=nickname))
+        return redirect(url_for('index'))
+    if user == g.user:
+        flash('You can\'t follow yourself!')
+        return redirect(url_for('user', nickname=nickname))
+    u = g.user.follow(user)
+    if u is None:
+        flash('Cannot follow {0}!'.format(nickname=nickname))
+        return redirect(url_for('user', nickname=nickname))
+    db.session.add(u)
+    db.session.commit()
+    flash('You are now following {0}!'.format(nickname=nickname))
+    return redirect(url_for('user', nickname=nickname))
+
+
+@app.route('/user/<nickname>/unfollow')
+@login_required
+def unfollow(nickname):
+    user = User.query.filter_by(nickname=nickname).first()
+    if user is None:
+        flash('User {0} not found.'.format(nickname=nickname))
+        return redirect(url_for('index'))
+    if user == g.user:
+        flash('You can\'t unfollow yourself!')
+        return redirect(url_for('user', nickname=nickname))
+    u = g.user.unfollow(user)
+    if u is None:
+        flash('Cannot unfollow {0}!'.format(nickname=nickname))
+        return redirect(url_for('user', nickname=nickname))
+    db.session.add(u)
+    db.session.commit()
+    flash('You have stopped following {0}'.format(nickname=nickname))
+    return redirect(url_for('user', nickname=nickname))
+
+
 @app.route('/album/id<int:id>')
 def album(id):
-    result = Album.query.get(id)
-    artist = Artist.query.get(result.artist_id)
-    return render_template('album.html', result=result, artist=artist)
+    album = Album.query.get(id)
+    artist = Artist.query.get(album.artist_id)
+    return render_template('album.html', result=album, artist=artist)
+
+
+@app.route('/album/id<int:id>/add')
+@login_required
+def add_album(id):
+    album = Album.query.get(id)
+    if album is None:
+        flash('Album not found!')
+        return redirect(url_for('index'))
+    a = g.user.add_album(album)
+    if a is None:
+            flash('Can\'t add album!')
+            return redirect(url_for('album', id=id))
+    db.session.add(a)
+    db.session.commit()
+    flash('Album successfully added!')
+    return redirect(url_for('album', id=id))
+
+
+@app.route('/album/id<int:id>/remove')
+@login_required
+def remove_album(id):
+    album = Album.query.get(id)
+    if album is None:
+        flash('Album not found!')
+        return redirect(url_for('index'))
+    a = g.user.remove_album(album)
+    if a is None:
+            flash('Can\'t remove album!')
+            return redirect(url_for('album', id=id))
+    db.session.add(a)
+    db.session.commit()
+    flash('Album successfully removed!')
+    return redirect(url_for('album', id=id))
+
+
+@app.route('/artist/id<int:id>')
+@login_required
+def artist(id):
+    artist = Artist.query.get(id)
+    return render_template('artist.html', result=artist)
