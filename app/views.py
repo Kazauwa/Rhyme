@@ -114,18 +114,18 @@ def edit():
 def follow(nickname):
     user = User.query.filter_by(nickname=nickname).first()
     if user is None:
-        flash('User {0} not found.'.format(nickname=nickname))
+        flash('User {0} not found.'.format(nickname))
         return redirect(url_for('index'))
     if user == g.user:
         flash('You can\'t follow yourself!')
         return redirect(url_for('user', nickname=nickname))
     u = g.user.follow(user)
     if u is None:
-        flash('Cannot follow {0}!'.format(nickname=nickname))
+        flash('Cannot follow {0}!'.format(nickname))
         return redirect(url_for('user', nickname=nickname))
     db.session.add(u)
     db.session.commit()
-    flash('You are now following {0}!'.format(nickname=nickname))
+    flash('You are now following {0}!'.format(nickname))
     return redirect(url_for('user', nickname=nickname))
 
 
@@ -134,18 +134,18 @@ def follow(nickname):
 def unfollow(nickname):
     user = User.query.filter_by(nickname=nickname).first()
     if user is None:
-        flash('User {0} not found.'.format(nickname=nickname))
+        flash('User {0} not found.'.format(nickname))
         return redirect(url_for('index'))
     if user == g.user:
         flash('You can\'t unfollow yourself!')
         return redirect(url_for('user', nickname=nickname))
     u = g.user.unfollow(user)
     if u is None:
-        flash('Cannot unfollow {0}!'.format(nickname=nickname))
+        flash('Cannot unfollow {0}!'.format(nickname))
         return redirect(url_for('user', nickname=nickname))
     db.session.add(u)
     db.session.commit()
-    flash('You have stopped following {0}'.format(nickname=nickname))
+    flash('You have stopped following {0}'.format(nickname))
     return redirect(url_for('user', nickname=nickname))
 
 

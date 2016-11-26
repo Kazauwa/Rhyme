@@ -17,6 +17,8 @@ def fill_db(dump):
     root = tree.getroot()
     print('Filling database:')
     for child in tqdm(root):
+        if Album.query.get(child.attrib.get('id')):
+            continue
         genres = [genre.text for genre in child.findall('genres/genre')]
         styles = [style.text for style in child.findall('styles/style')]
         genres += styles
@@ -53,7 +55,7 @@ def fill_db(dump):
 @manager.command
 def fill_track():
     '''Fill Track entity'''
-    for album in tqdm(Album.query.filter(Album.tracklist == None).all()):
+    for album in tqdm(Album.query.filter(Album.tracklist == None).limit(1000).all()):
         r = requests.get('{0}{1}'.format(DISCOGS_MASTER, album.discogs_id), headers=HEADERS)
         result = r.json()
         for track in result.get('tracklist'):
@@ -62,16 +64,15 @@ def fill_track():
                               duration=track.get('duration'),
                               position=track.get('position'))
                 album.tracklist.append(track)
+                album.cover = result.get('images')[0].get('uri')
+                album.thumb = result.get('images')[0].get('uri150')
                 db.session.add(track)
+                db.session.add(album)
                 db.session.commit()
             except:
                 # TODO: remove later
                 print(sys.exc_info())
                 db.session.rollback()
-        album.cover = result.get('images')[0].get('uri')
-        album.thumb = result.get('images')[0].get('uri150')
-        db.session.add(album)
-        db.session.commit()
 
 
 @manager.command

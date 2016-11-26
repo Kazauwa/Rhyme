@@ -22,10 +22,10 @@
             {% endif %}
     </div>
     <div class="col-md-6">
-        {% if g.user.collection %}
+        {% if user.collection.all() %}
             <h3>Collection:</h3>
                 <div class="row">
-                    {% for album in g.user.collection %}
+                    {% for album in user.collection %}
                         <div class="col-md-4">
                             <center><img src="{{ album.thumb }}" class="img-rounded"></center><br>
                             <div class="caption">
@@ -35,22 +35,26 @@
                     {% endfor %}
                 </div>            
         {% else %}
-            <center><h3> {{ g.user.nickname }} is not following anyone yet! </h3></center>
+            <center><h3> {{ user.nickname }}'s collection is empty! </h3></center>
         {% endif %}
     </div>
     <div class="col-md-3">
-        {% if g.user.following %}
+        {% if user.followed.all() %}
             <h4>Follows:</h4>
             <div class="well">
-                {% for followee in g.user.following %}
-                    <center><img src="{{ followee.thumb }}" class="img-rounded"></center><br>
-                    <div class="caption">
-                        <center><a href="{{ url_for('user', id=followee.id) }}">{{ followee.nickname }}</a></center><br>
-                    </div>
-                {% endfor %}
+                <div class="row">
+                    {% for followee in user.followed %}
+                        <div class="col-md-4">
+                            <center><img src="{{ followee.thumb }}" class="img-rounded"></center><br>
+                            <div class="caption">
+                                <center><a href="{{ url_for('user', nickname=followee.nickname) }}">{{ followee.nickname }}</a></center><br>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         {% else %}
-            <center><h3> {{ g.user.nickname }} is not following anyone yet! </h3></center>
+            <center><h3> {{ user.nickname }} is not following anyone yet! </h3></center>
         {% endif %}
     </div>
 </div>
