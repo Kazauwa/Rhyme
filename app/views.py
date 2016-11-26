@@ -48,7 +48,7 @@ def login():
         'vk_authorized',
         next=request.args.get('next') or request.referrer or None,
         _external=True)
-    return vk.authorize(callback=callback)
+    return vk.authorize(callback='http://52.57.140.78/login/authorized')
 
 
 @app.route('/logout')

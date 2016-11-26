@@ -16,6 +16,7 @@
 
 {% if g.user.is_authenticated %}
 <center><h1>Hi, {{ g.user.nickname }}! We missed you!</h1></center><br><br>
+{% if g.user.collection.all() %}
 <center><h2>Take a look at your latest additions:</h2></center>
 <div class="col-md-10 col-md-offset-1">
     <div class="well">
@@ -31,6 +32,9 @@
         </div>
     </div>
 </div>
+{% else %}
+<center><h2> Your library is empty. Start gathering your collection <a href="{{ url_for('search') }}"> right now</a>!</h2></center>
+{% endif %}
 {% endif %}
 
 {% endblock %}
