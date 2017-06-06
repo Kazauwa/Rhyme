@@ -27,7 +27,7 @@ That's it! You are ready to start! Run `./manage.py runserver` in terminal to st
 
 More functions will be added in future. 
 
-To fill local db with data, [download] (http://data.discogs.com/) the latest dump (discogs_xxx_masters.xml.gz) unpack it and run
+To fill local db with data, [download](http://data.discogs.com/) the latest dump (discogs_xxx_masters.xml.gz) unpack it and run
 ```
 ./manage.py fill_db path/to/masters.xml
 ```
@@ -39,4 +39,4 @@ After that, run `./manage.py fill_track` to complete filling database.
 ./manage.py build_index
 ```
 
-For managing migrations read the [official documentation] (https://flask-migrate.readthedocs.io/en/latest/)
+For managing migrations read the [official documentation](https://flask-migrate.readthedocs.io/en/latest/)
